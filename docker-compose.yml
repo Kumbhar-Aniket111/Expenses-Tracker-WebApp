@@ -1,0 +1,42 @@
+services:
+  java-app:
+    container_name: expensesapp
+    build:
+      context: .
+    networks:
+      - java-app
+    environment:
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_URL: "jdbc:mysql://mysql:3306/expenses_tracker?allowPublicKeyRetrieval=true&useSSL=false"
+      SPRING_DATASOURCE_PASSWORD: spring@123
+    ports:
+    - "8080:8080"
+    restart: always
+    depends_on:
+    - mysql
+
+  mysql:
+    container_name: mysql
+    image: mysql
+    ports:
+    - "3306:3306"
+    networks:
+      - java-app
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: spring@123
+      MYSQL_DATABASE: expenses_tracker
+    volumes:
+    - my-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "-h", "-uroot", "-pspring@123"]
+      interval: 1m30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
+
+networks:
+  java-app:
+
+volumes:
+  my-data:
